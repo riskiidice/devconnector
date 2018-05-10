@@ -1,6 +1,8 @@
 import axios from 'axios';
-import {GET_ERRORS} from './types'
+import {GET_ERRORS, SET_CURRENT_USER} from './types'
 import setAuthToken from './../utils/setAuthToken';
+import jwt_decode from 'jwt-decode';
+
 // Register User
 export const registerUser = (userData ,history) => dispatch => {  
    axios.post('/api/users/register', userData)
@@ -24,6 +26,9 @@ export const loginUser = (userData) => dispatch => {
       localStorage.setItem('jwtToken', token);
       // Set token to Auth Header
       setAuthToken(token);
+      // Set current user
+      const decoded  = jwt_decode(token);
+      dispatch(setCurrentUser(decoded));
 
   })
   .catch(err=> 
@@ -32,4 +37,12 @@ export const loginUser = (userData) => dispatch => {
       payload: err.response.data
 })
 );
+}
+
+// Set logged current user
+export const setCurrentUser = (decoded) => {
+    return {
+      type: SET_CURRENT_USER,
+      payload: decoded
+    }
 }
